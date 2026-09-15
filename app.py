@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+from huggingface_hub import hf_hub_download
 from PIL import Image
 
 from tensorflow.keras.models import load_model
@@ -66,10 +67,7 @@ st.caption(
 # PROJECT PERFORMANCE
 # ============================================================
 
-st.markdown(
-    '<div class="section-heading">📈 Model Performance Overview</div>',
-    unsafe_allow_html=True
-)
+st.subheader("📈 Model Performance Overview")
 
 k1, k2, k3, k4, k5 = st.columns(5)
 
@@ -118,10 +116,7 @@ st.caption(
 # MODEL COMPARISON
 # ============================================================
 
-st.markdown(
-    '<div class="section-heading">⚖️ Technique Comparison</div>',
-    unsafe_allow_html=True
-)
+st.subheader("⚖️ Technique Comparison")
 
 comparison_df = pd.DataFrame(
     [
@@ -175,26 +170,22 @@ comparison_df = pd.DataFrame(
 
 st.dataframe(
     comparison_df,
-    use_container_width=True,
+    width="stretch",
     hide_index=True
 )
 
 st.caption(
     "pp = percentage points. Numerical comparison includes feature "
     "engineering; the final Random Forest additionally uses location "
-    "features, so this row should be interpreted as the evaluated "
-    "pipeline comparison rather than a pure algorithm-only comparison."
+    "features, so this row represents the evaluated pipeline comparison."
 )
 
 
 # ============================================================
-# RELATIVE IMPROVEMENT
+# IMPROVEMENT
 # ============================================================
 
-st.markdown(
-    '<div class="section-heading">📊 Improvement of Selected Models</div>',
-    unsafe_allow_html=True
-)
+st.subheader("📊 Improvement of Selected Models")
 
 improvement_df = pd.DataFrame(
     [
@@ -233,7 +224,7 @@ improvement_df = pd.DataFrame(
 
 st.dataframe(
     improvement_df,
-    use_container_width=True,
+    width="stretch",
     hide_index=True
 )
 
@@ -250,21 +241,27 @@ with st.expander("📚 Dataset & Feature Overview"):
                 "Modality": "Numerical",
                 "Dataset": "US Accidents",
                 "Real Samples": "200,000 balanced",
-                "Main Features": "Weather, road flags, time, latitude/longitude",
+                "Main Features": (
+                    "Weather, road flags, time, latitude/longitude"
+                ),
                 "Task": "Severity 1–4"
             },
             {
                 "Modality": "Text",
                 "Dataset": "US Accidents",
                 "Real Samples": "200,000 balanced",
-                "Main Features": "Accident Description → TF-IDF 1–2 grams",
+                "Main Features": (
+                    "Accident Description → TF-IDF 1–2 grams"
+                ),
                 "Task": "Severity 1–4"
             },
             {
                 "Modality": "Audio",
                 "Dataset": "UrbanSound8K",
                 "Real Samples": "8,732 clips",
-                "Main Features": "40 MFCC means + 40 MFCC standard deviations",
+                "Main Features": (
+                    "40 MFCC means + 40 MFCC standard deviations"
+                ),
                 "Task": "10 sound classes"
             },
             {
@@ -278,7 +275,9 @@ with st.expander("📚 Dataset & Feature Overview"):
                 "Modality": "Video",
                 "Dataset": "HWID12 Highway Incidents",
                 "Real Samples": "500 sampled real videos",
-                "Main Features": "8 frames/video → MobileNetV2 1280-D features",
+                "Main Features": (
+                    "8 frames/video → MobileNetV2 1280-D features"
+                ),
                 "Task": "Accident / Normal"
             }
         ]
@@ -286,95 +285,113 @@ with st.expander("📚 Dataset & Feature Overview"):
 
     st.dataframe(
         dataset_df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True
     )
 
     st.info(
-        "No synthetic samples are used. The project uses real dataset "
-        "records, with balancing performed by selecting real samples."
+        "No synthetic samples are used. Real dataset samples were used "
+        "throughout the project; balancing was performed by selecting "
+        "real samples."
     )
 
 
 # ============================================================
-# LOAD MODELS
+# HUGGING FACE REPOSITORY
+# ============================================================
+
+HF_REPO = (
+    "Black-Bolt/road-safety-intelligence-models"
+)
+
+
+# ============================================================
+# LAZY MODEL LOADERS
 # ============================================================
 
 @st.cache_resource
-def load_all_models():
+def load_numerical_models():
 
-    numerical_model = joblib.load(
-        "models/numerical_model.pkl"
+    model_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="numerical_model.pkl"
     )
 
-    numerical_preprocessor = joblib.load(
-        "models/numerical_preprocessor.pkl"
+    preprocessor_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="numerical_preprocessor.pkl"
     )
 
-    text_tfidf = joblib.load(
-        "models/text_tfidf.pkl"
+    model = joblib.load(model_path)
+    preprocessor = joblib.load(preprocessor_path)
+
+    return model, preprocessor
+
+
+@st.cache_resource
+def load_text_models():
+
+    tfidf_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="text_tfidf.pkl"
     )
 
-    text_model = joblib.load(
-        "models/text_model.pkl"
+    model_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="text_model.pkl"
     )
 
-    audio_model = joblib.load(
-        "models/audio_model.pkl"
+    tfidf = joblib.load(tfidf_path)
+    model = joblib.load(model_path)
+
+    return tfidf, model
+
+
+@st.cache_resource
+def load_audio_model():
+
+    model_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="audio_model.pkl"
     )
 
-    image_model = load_model(
-        "models/image_mobilenetv2.keras"
+    return joblib.load(model_path)
+
+
+@st.cache_resource
+def load_image_model():
+
+    model_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="image_mobilenetv2.keras"
     )
 
-    video_cnn = load_model(
-        "models/video_mobilenetv2.keras"
+    return load_model(model_path)
+
+
+@st.cache_resource
+def load_video_models():
+
+    cnn_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="video_mobilenetv2.keras"
     )
 
-    video_lstm = load_model(
-        "models/video_lstm.keras"
+    lstm_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="video_lstm.keras"
     )
 
-    video_gru = load_model(
-        "models/video_gru.keras"
+    gru_path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename="video_gru.keras"
     )
 
-    return (
-        numerical_model,
-        numerical_preprocessor,
-        text_tfidf,
-        text_model,
-        audio_model,
-        image_model,
-        video_cnn,
-        video_lstm,
-        video_gru
-    )
+    cnn = load_model(cnn_path)
+    lstm = load_model(lstm_path)
+    gru = load_model(gru_path)
 
-
-try:
-
-    (
-        numerical_model,
-        numerical_preprocessor,
-        text_tfidf,
-        text_model,
-        audio_model,
-        image_model,
-        video_cnn,
-        video_lstm,
-        video_gru
-    ) = load_all_models()
-
-    models_loaded = True
-
-except Exception as e:
-
-    models_loaded = False
-
-    st.error(
-        f"Model loading error: {e}"
-    )
+    return cnn, lstm, gru
 
 
 # ============================================================
@@ -572,143 +589,143 @@ with tab_num:
         key="numerical_predict"
     ):
 
-        if not models_loaded:
+        try:
 
-            st.error(
-                "Numerical model could not be loaded."
+            with st.spinner(
+                "Loading numerical model..."
+            ):
+
+                numerical_model, numerical_preprocessor = (
+                    load_numerical_models()
+                )
+
+            is_weekend = int(
+                day_of_week >= 5
             )
 
-        else:
+            hour_sin = np.sin(
+                2 * np.pi * hour / 24
+            )
 
-            try:
+            hour_cos = np.cos(
+                2 * np.pi * hour / 24
+            )
 
-                is_weekend = int(
-                    day_of_week >= 5
+            day_sin = np.sin(
+                2 * np.pi * day_of_week / 7
+            )
+
+            day_cos = np.cos(
+                2 * np.pi * day_of_week / 7
+            )
+
+            month_sin = np.sin(
+                2 * np.pi * month / 12
+            )
+
+            month_cos = np.cos(
+                2 * np.pi * month / 12
+            )
+
+            numerical_input = pd.DataFrame(
+                [{
+                    "Distance(mi)": distance,
+                    "Temperature(F)": temperature,
+                    "Humidity(%)": humidity,
+                    "Pressure(in)": pressure,
+                    "Visibility(mi)": visibility,
+                    "Wind_Speed(mph)": wind_speed,
+                    "Precipitation(in)": precipitation,
+
+                    "Hour": hour,
+                    "DayOfWeek": day_of_week,
+                    "Month": month,
+                    "IsWeekend": is_weekend,
+
+                    "Hour_sin": hour_sin,
+                    "Hour_cos": hour_cos,
+                    "Day_sin": day_sin,
+                    "Day_cos": day_cos,
+                    "Month_sin": month_sin,
+                    "Month_cos": month_cos,
+
+                    "Start_Lat": latitude,
+                    "Start_Lng": longitude,
+
+                    "Amenity": amenity,
+                    "Bump": bump,
+                    "Crossing": crossing,
+                    "Junction": junction,
+                    "Railway": railway,
+                    "Roundabout": roundabout,
+                    "Station": station,
+                    "Stop": stop,
+                    "Traffic_Signal": traffic_signal,
+
+                    "Sunrise_Sunset": sunrise_sunset
+                }]
+            )
+
+            processed = (
+                numerical_preprocessor.transform(
+                    numerical_input
                 )
+            )
 
-                hour_sin = np.sin(
-                    2 * np.pi * hour / 24
+            prediction = int(
+                numerical_model.predict(
+                    processed
+                )[0]
+            )
+
+            severity_info = {
+
+                1: (
+                    "Minor",
+                    "Lower-severity accident with relatively limited impact."
+                ),
+
+                2: (
+                    "Moderate",
+                    "Accident with a moderate level of disruption."
+                ),
+
+                3: (
+                    "Serious",
+                    "Accident associated with substantial traffic disruption."
+                ),
+
+                4: (
+                    "Severe",
+                    "Highest severity category in the dataset."
                 )
+            }
 
-                hour_cos = np.cos(
-                    2 * np.pi * hour / 24
-                )
+            severity_name, severity_description = (
+                severity_info[prediction]
+            )
 
-                day_sin = np.sin(
-                    2 * np.pi * day_of_week / 7
-                )
+            st.subheader("Prediction Result")
 
-                day_cos = np.cos(
-                    2 * np.pi * day_of_week / 7
-                )
+            st.success(
+                f"🚨 Predicted Severity: "
+                f"**{prediction} — {severity_name}**"
+            )
 
-                month_sin = np.sin(
-                    2 * np.pi * month / 12
-                )
+            st.write(
+                severity_description
+            )
 
-                month_cos = np.cos(
-                    2 * np.pi * month / 12
-                )
+            st.caption(
+                "Random Forest • 29 numerical/contextual features • "
+                "Test Accuracy: 71.59% • Macro F1: 71.00%"
+            )
 
-                numerical_input = pd.DataFrame(
-                    [{
-                        "Distance(mi)": distance,
-                        "Temperature(F)": temperature,
-                        "Humidity(%)": humidity,
-                        "Pressure(in)": pressure,
-                        "Visibility(mi)": visibility,
-                        "Wind_Speed(mph)": wind_speed,
-                        "Precipitation(in)": precipitation,
+        except Exception as e:
 
-                        "Hour": hour,
-                        "DayOfWeek": day_of_week,
-                        "Month": month,
-                        "IsWeekend": is_weekend,
-
-                        "Hour_sin": hour_sin,
-                        "Hour_cos": hour_cos,
-                        "Day_sin": day_sin,
-                        "Day_cos": day_cos,
-                        "Month_sin": month_sin,
-                        "Month_cos": month_cos,
-
-                        "Start_Lat": latitude,
-                        "Start_Lng": longitude,
-
-                        "Amenity": amenity,
-                        "Bump": bump,
-                        "Crossing": crossing,
-                        "Junction": junction,
-                        "Railway": railway,
-                        "Roundabout": roundabout,
-                        "Station": station,
-                        "Stop": stop,
-                        "Traffic_Signal": traffic_signal,
-
-                        "Sunrise_Sunset": sunrise_sunset
-                    }]
-                )
-
-                processed = (
-                    numerical_preprocessor.transform(
-                        numerical_input
-                    )
-                )
-
-                prediction = int(
-                    numerical_model.predict(
-                        processed
-                    )[0]
-                )
-
-                severity_info = {
-
-                    1: (
-                        "Minor",
-                        "Lower-severity accident with relatively limited impact."
-                    ),
-
-                    2: (
-                        "Moderate",
-                        "Accident with a moderate level of disruption."
-                    ),
-
-                    3: (
-                        "Serious",
-                        "Accident associated with substantial traffic disruption."
-                    ),
-
-                    4: (
-                        "Severe",
-                        "Highest severity category in the dataset."
-                    )
-                }
-
-                severity_name, severity_description = (
-                    severity_info[prediction]
-                )
-
-                st.subheader("Prediction Result")
-
-                st.success(
-                    f"🚨 Predicted Severity: "
-                    f"**{prediction} — {severity_name}**"
-                )
-
-                st.write(
-                    severity_description
-                )
-
-                st.caption(
-                    "Random Forest • 29 numerical/contextual features • "
-                    "Test Accuracy: 71.59% • Macro F1: 71.00%"
-                )
-
-            except Exception as e:
-
-                st.error(
-                    f"Numerical prediction error: {e}"
-                )
+            st.error(
+                f"Numerical prediction error: {e}"
+            )
 
 
 # ============================================================
@@ -745,15 +762,17 @@ with tab_text:
                 "Please enter an accident description."
             )
 
-        elif not models_loaded:
-
-            st.error(
-                "Text model could not be loaded."
-            )
-
         else:
 
             try:
+
+                with st.spinner(
+                    "Loading text model..."
+                ):
+
+                    text_tfidf, text_model = (
+                        load_text_models()
+                    )
 
                 vectorized_text = (
                     text_tfidf.transform(
@@ -867,7 +886,6 @@ with tab_audio:
         )
 
         if audio_file is not None:
-
             st.audio(audio_file)
 
     else:
@@ -878,7 +896,6 @@ with tab_audio:
         )
 
         if recorded_audio is not None:
-
             st.audio(recorded_audio)
 
     if st.button(
@@ -898,17 +915,19 @@ with tab_audio:
                 "Please upload an audio file or record a sound."
             )
 
-        elif not models_loaded:
-
-            st.error(
-                "Audio model could not be loaded."
-            )
-
         else:
 
             temp_audio = None
 
             try:
+
+                with st.spinner(
+                    "Loading audio model..."
+                ):
+
+                    audio_model = (
+                        load_audio_model()
+                    )
 
                 temp_audio = tempfile.NamedTemporaryFile(
                     delete=False,
@@ -1024,7 +1043,7 @@ with tab_image:
         st.image(
             image,
             caption="Uploaded Image",
-            use_container_width=True
+            width="stretch"
         )
 
     if st.button(
@@ -1038,15 +1057,17 @@ with tab_image:
                 "Please upload an image."
             )
 
-        elif not models_loaded:
-
-            st.error(
-                "Image model could not be loaded."
-            )
-
         else:
 
             try:
+
+                with st.spinner(
+                    "Loading image model..."
+                ):
+
+                    image_model = (
+                        load_image_model()
+                    )
 
                 resized_image = image.resize(
                     (224, 224)
@@ -1151,17 +1172,19 @@ with tab_video:
                 "Please upload a video first."
             )
 
-        elif not models_loaded:
-
-            st.error(
-                "Video models could not be loaded."
-            )
-
         else:
 
             temp_video = None
 
             try:
+
+                with st.spinner(
+                    "Loading video models..."
+                ):
+
+                    video_cnn, video_lstm, video_gru = (
+                        load_video_models()
+                    )
 
                 temp_video = tempfile.NamedTemporaryFile(
                     delete=False,
