@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local secrets
+.env
+
+# Large trained model artifacts
+models/*.pkl
+models/*.keras
+
+# Streamlit
+.streamlit/secrets.toml

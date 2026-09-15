@@ -1,0 +1,188 @@
+/* ============================================================
+   ROAD SAFETY INTELLIGENCE
+   Global Streamlit Styling
+   ============================================================ */
+
+/* ---------- PAGE ---------- */
+
+.block-container {
+    width: 100%;
+    max-width: 100%;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    padding-left: 4vw;
+    padding-right: 4vw;
+}
+
+h1 {
+    font-size: 3.2rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* ---------- HERO ---------- */
+
+.hero {
+    padding: 2.8rem 3rem;
+    border-radius: 24px;
+    margin-bottom: 1.8rem;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a 0%,
+            #17375e 48%,
+            #0f766e 100%
+        );
+
+    color: white;
+
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.22);
+}
+
+.hero-title {
+    font-size: 3.25rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.7rem;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 1000px;
+    opacity: 0.92;
+}
+
+.hero-badge {
+    display: inline-block;
+    margin-top: 1.1rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* ---------- SECTION HEADINGS ---------- */
+
+.section-heading {
+    font-size: 1.65rem;
+    font-weight: 750;
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+
+/* ---------- KPI METRICS ---------- */
+
+div[data-testid="stMetric"] {
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 1.1rem 1.2rem;
+    min-height: 125px;
+
+    box-shadow:
+        0 5px 18px rgba(0, 0, 0, 0.14);
+}
+
+div[data-testid="stMetricLabel"] {
+    font-weight: 650;
+}
+
+div[data-testid="stMetricValue"] {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+/* ---------- CONTAINERS ---------- */
+
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 16px;
+}
+
+/* ---------- INFO BOX ---------- */
+
+div[data-testid="stAlert"] {
+    border-radius: 14px;
+}
+
+/* ---------- BUTTONS ---------- */
+
+.stButton > button {
+    border-radius: 10px;
+    font-weight: 650;
+    min-height: 2.7rem;
+}
+
+/* ---------- FILE UPLOADERS ---------- */
+
+section[data-testid="stFileUploaderDropzone"] {
+    border-radius: 14px;
+}
+
+/* ---------- TEXT AREA ---------- */
+
+textarea {
+    border-radius: 12px !important;
+}
+
+/* ---------- TABLE ---------- */
+
+div[data-testid="stDataFrame"] {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* ---------- TABS ---------- */
+
+button[data-baseweb="tab"] {
+    font-size: 1rem;
+    font-weight: 700;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* ---------- CAPTION ---------- */
+
+.stCaption {
+    line-height: 1.5;
+}
+
+/* ---------- RESULT EMPHASIS ---------- */
+
+.result-title {
+    font-size: 1.35rem;
+    font-weight: 750;
+    margin-bottom: 0.4rem;
+}
+
+/* ---------- SMALL SCREEN ---------- */
+
+@media (max-width: 900px) {
+
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .hero {
+        padding: 2rem 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 2.25rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    div[data-testid="stMetricValue"] {
+        font-size: 1.6rem;
+    }
+}
