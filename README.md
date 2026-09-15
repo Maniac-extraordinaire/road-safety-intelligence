@@ -42,17 +42,18 @@ For every modality, two techniques were compared and the better-performing model
 The project uses **real dataset samples only**. Class balancing was performed by selecting real samples from the datasets.
 
 Trained model files are hosted separately on Hugging Face:
+
 🤗 https://huggingface.co/Black-Bolt/road-safety-intelligence-models
 
-##Future Improvements
+## Future Improvements
 
--Dedicated crash-audio dataset
--Multimodal prediction fusion
--Larger real-world datasets
--Model explainability
+- Dedicated crash-audio dataset
+- Multimodal prediction fusion
+- Larger real-world datasets
+- Model explainability
 
-Author
+## Author
 
-Himanshu Singh
+**Himanshu Singh**
+
 GitHub: https://github.com/Maniac-extraordinaire
-
