@@ -7,7 +7,6 @@ The project compares two techniques for each modality and integrates the best-pe
 ## Live Demo
 
 🌐 https://road-safety-intelligence.streamlit.app/
-🔗 **Live Demo:** https://road-safety-intelligence.streamlit.app/
 
 ## Results
 
@@ -45,12 +44,12 @@ The project uses **real dataset samples only**. Class balancing was performed by
 Trained model files are hosted separately on Hugging Face:
 🤗 https://huggingface.co/Black-Bolt/road-safety-intelligence-models
 
-Future Improvements -
+##Future Improvements
 
-Dedicated crash-audio dataset
-Multimodal prediction fusion
-Larger real-world datasets
-Model explainability
+-Dedicated crash-audio dataset
+-Multimodal prediction fusion
+-Larger real-world datasets
+-Model explainability
 
 Author
 
